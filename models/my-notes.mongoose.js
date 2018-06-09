@@ -18,6 +18,18 @@ var myNotesAppSchema = mongoose.Schema(
         {
             type: String,
             required: true
+        },
+        createdOn:
+        {
+            type: Date,
+            default: Date.now,
+            required: true
+        },
+        updatedOn:
+        {
+            type: Date,
+            default: Date.now,
+            required: true
         }
     }
 );
@@ -31,7 +43,8 @@ exports.addNote = function(_userId, newNoteObject, callback)
     var newNote = {
         userId: _userId,
         noteId: newNoteObject.noteId,
-        noteText: newNoteObject.noteText
+        noteText: newNoteObject.noteText,
+        updatedOn: newNoteObject.updatedOn
     };
 
     MyNotesAppModel.create(newNote, callback);
@@ -45,7 +58,7 @@ exports.updateNote = function(_userId, _noteId, updatedNoteObject, options, call
     
     if(updatedNoteObject.noteText)
     {
-        update = { noteText: updatedNoteObject.noteText };
+        update = { noteText: updatedNoteObject.noteText, updatedOn: updatedNoteObject.updatedOn };
     }
 
     MyNotesAppModel.findOneAndUpdate(query, update, options, callback)
