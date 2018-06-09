@@ -58,7 +58,9 @@ exports.deleteNote = function(userId, noteId, callback)
     MyNotesAppModel.remove(query, callback);
 }
 
-exports.getAllNotes = function(userId, callback)
+exports.getAllNotes = function(_userId, callback)
 {
-    MyNotesAppModel.findById(userId, callback)
+    var query = { userId: _userId };
+
+    MyNotesAppModel.find(query, callback);
 }
