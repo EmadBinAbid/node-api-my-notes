@@ -51,9 +51,9 @@ exports.updateNote = function(_userId, _noteId, updatedNoteObject, options, call
     MyNotesAppModel.findOneAndUpdate(query, update, options, callback)
 }
 
-exports.deleteNote = function(userId, noteId, callback)
+exports.deleteNote = function(_userId, _noteId, callback)
 {
-    var query = {userId: _userId, noteId: _noteId};
+    var query = { userId: _userId, noteId: _noteId };
 
     MyNotesAppModel.remove(query, callback);
 }
