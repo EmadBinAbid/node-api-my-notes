@@ -1,6 +1,8 @@
 //Dependencies
 var mongoose = require('mongoose');
 
+var noteIds = 3;
+
 //MyNotesApp Schema
 var myNotesAppSchema = mongoose.Schema(
     {
@@ -42,26 +44,33 @@ exports.addNote = function(_userId, newNoteObject, callback)
 {
     var newNote = {
         userId: _userId,
-        noteId: newNoteObject.noteId,
+        noteId: noteIds,
         noteText: newNoteObject.noteText,
-        updatedOn: newNoteObject.updatedOn
+        createdOn: new Date(),
+        updatedOn: new Date()
     };
+
+    noteIds++;
 
     MyNotesAppModel.create(newNote, callback);
 }
 
 exports.updateNote = function(_userId, _noteId, updatedNoteObject, options, callback)
 {
+    console.log("Here..");
+
     var query = {userId: _userId, noteId: _noteId};
 
     var update;
     
     if(updatedNoteObject.noteText)
     {
-        update = { noteText: updatedNoteObject.noteText, updatedOn: updatedNoteObject.updatedOn };
+        update = { noteText: updatedNoteObject.noteText, updatedOn: new Date() };
+        console.log(updatedNoteObject.noteText);
     }
 
-    MyNotesAppModel.findOneAndUpdate(query, update, options, callback)
+    MyNotesAppModel.findOneAndUpdate(query, update, options, callback);
+    console.log("DOnww");
 }
 
 exports.deleteNote = function(_userId, _noteId, callback)
