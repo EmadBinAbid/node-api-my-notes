@@ -8,19 +8,22 @@ var mongoose = require('mongoose');
 var express = require('express');
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
+var cors = require('cors');
 
 var app = express();
 
 //Middlewares
 app.use(express.json());
+app.use(cors());
 
-app.use(function(req, res, next)
+
+/*app.use(function(req, res, next)
 {
     res.header('Access-Control-Allow-Origin', "*");
     res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
-});
+});*/
 
 /*Http Requests*/
 
@@ -41,15 +44,24 @@ app.post('/my-notes/:userId', (req, res) => {
 });
 
 //updateNote
-app.put('/my-notes/:userId/:noteId', (req, res) => {
-    myNotesAppSchema.updateNote(req.params.userId, req.params.noteId, req.body, {}, function(err, noteObject)
-    {
+app.put('/my-notes/:noteId', verifyToken, (req, res) => {
+    jwt.verify(req.token, 'secret-key', (err, authData) => {
         if(err)
         {
-            res.status(404).send("Error updating the object.");
-            return;
+            res.status(400).send("Token not verified.");
         }
-        res.json(noteObject);
+        else
+        {
+            myNotesAppSchema.updateNote(authData[0].userId, req.params.noteId, req.body, {}, function(err, noteObject)
+            {
+                if(err)
+                {
+                    res.status(404).send("Error updating the object.");
+                    return;
+                }
+                res.json(noteObject);
+            });
+        }
     });
 });
 
@@ -67,7 +79,8 @@ app.delete('/my-notes/:userId/:noteId', (req, res) => {
 });
 
 //getAllNotes
-app.get('/my-notes', verifyToken, (req, res) => {
+app.get('/get-my-notes', verifyToken, (req, res) => {
+    console.log("/get-my-notes");
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         console.log(req.token);
         if(err)
