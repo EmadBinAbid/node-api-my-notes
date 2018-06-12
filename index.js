@@ -6,6 +6,8 @@ var authenticationSchema = require('./models/authentication.mongoose.js');
 
 var mongoose = require('mongoose');
 var express = require('express');
+var jwt = require('jsonwebtoken');
+var bcrypt = require('bcryptjs');
 
 var app = express();
 
@@ -65,15 +67,26 @@ app.delete('/my-notes/:userId/:noteId', (req, res) => {
 });
 
 //getAllNotes
-app.get('/my-notes/:userId', (req, res) => {
-    myNotesAppSchema.getAllNotes(req.params.userId, function(err, noteObject)
-    {
+app.get('/my-notes', verifyToken, (req, res) => {
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
+        console.log(req.token);
         if(err)
         {
-            res.status(404).send("Error getting the object.");
-            return;
+            res.status("Token not verified.");
         }
-        res.json(noteObject);
+        else
+        {
+            console.log(authData);
+            myNotesAppSchema.getAllNotes(authData.user[0].userId, function(err, noteObject)
+            {
+                if(err)
+                {
+                    res.status(404).send("Error getting the object.");
+                    return;
+                }
+                res.json(noteObject);
+            });
+        }
     });
 });
 
@@ -82,7 +95,8 @@ app.get('/my-notes/:userId', (req, res) => {
 authenticationSchema
 */
 //addUser
-app.post('/authentication', (req, res) => {
+app.post('/register', (req, res) => {
+    console.log("In /register.");
     authenticationSchema.addUser(req.body, function(err, userObject)
     {
        if(err)
@@ -134,7 +148,7 @@ app.get('/authentication/:userId', (req, res) => {
 });
 
 //validateUser
-app.get('/authentication-user', (req, res) => {
+app.post('/login', (req, res) => {
     authenticationSchema.validateUser(req.query.userId, req.query.password, function(err, isValid)
     {
         if(err)
@@ -143,19 +157,23 @@ app.get('/authentication-user', (req, res) => {
             return;
         }
 
+        //console.log(isValid);
         if(isValid.length === 1)
         {
-            res.status(200).send(true);
+            jwt.sign({ user: isValid }, 'secretkey', (err, token) => {
+                res.json({ userId: isValid[0].userId, password: isValid[0].password, token: token });
+            });
         }
         else
         {
-            res.status(200).send(false);
+            res.status(400).send("Unknown user.");
         }
+        
     });
 });
 
 //getAllUsers
-app.get('/authentication', (req, res) => {
+app.get('/get-users', (req, res) => {
     authenticationSchema.getAllUsers(function(err, userObject)
     {
         if(err)
@@ -166,6 +184,25 @@ app.get('/authentication', (req, res) => {
         res.json(userObject);
     });
 });
+
+
+//Verify token
+function verifyToken(req, res, next)
+{
+    const bearerHeader = req.headers['authorization'];
+
+    if(typeof bearerHeader !== 'undefined')
+    {
+        const token = bearerHeader.split(' ')[1];
+        req.token = token;
+        next();
+    }
+    else
+    {
+        res.status(400).send("Token not verified.");
+    }
+
+}
 
 
 

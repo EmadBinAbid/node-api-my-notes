@@ -69,6 +69,8 @@ exports.updateNote = function(_userId, _noteId, updatedNoteObject, options, call
         console.log(updatedNoteObject.noteText);
     }
 
+    options.new = true;
+
     MyNotesAppModel.findOneAndUpdate(query, update, options, callback);
     console.log("DOnww");
 }
