@@ -31,28 +31,43 @@ app.use(cors());
 myNotesAppSchema
 */
 //addNote
-app.post('/my-notes/:userId', (req, res) => {
-    myNotesAppSchema.addNote(req.params.userId, req.body, function(err, noteObject)
-    {
-       if(err)
-       {
-           res.status(400).send("Bad request.");
-           return;
-       }
-       res.json(noteObject);
-    });
-});
+app.post('/add-my-notes', verifyToken, (req, res) => {
 
-//updateNote
-app.put('/my-notes/:noteId', verifyToken, (req, res) => {
-    jwt.verify(req.token, 'secret-key', (err, authData) => {
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
         if(err)
         {
             res.status(400).send("Token not verified.");
         }
         else
         {
-            myNotesAppSchema.updateNote(authData[0].userId, req.params.noteId, req.body, {}, function(err, noteObject)
+            myNotesAppSchema.addNote(authData.user[0].userId, req.body, function(err, noteObject)
+            {
+                console.log(authData);
+                if(err)
+                {
+                    res.status(400).send("Bad request.");
+                    return;
+                }
+                res.json(noteObject);
+            });
+        }
+    });
+
+});
+
+//updateNote
+app.put('/update-my-notes/:noteId', verifyToken, (req, res) => {
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
+        if(err)
+        {
+            console.log("HEREEEEEE..");
+            console.log(err);
+            res.status(400).send("Token not verified.");
+        }
+        else
+        {
+            console.log(authData);
+            myNotesAppSchema.updateNote(authData.user[0].userId, req.params.noteId, req.body, {}, function(err, noteObject)
             {
                 if(err)
                 {
@@ -66,26 +81,38 @@ app.put('/my-notes/:noteId', verifyToken, (req, res) => {
 });
 
 //deleteNote
-app.delete('/my-notes/:userId/:noteId', (req, res) => {
-    myNotesAppSchema.deleteNote(req.params.userId, req.params.noteId, function(err, noteObject)
-    {
+app.delete('/delete-my-notes/:noteId', verifyToken, (req, res) => {
+    console.log("Delete.");
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
         if(err)
         {
-            res.status(404).send("Error deleting the object.");
-            return;
+            req.status(400).send("Token not verified.");
         }
-        res.json(noteObject);
+        else
+        {
+            console.log(authData);
+            myNotesAppSchema.deleteNote(authData.user[0].userId, req.params.noteId, function(err, noteObject)
+            {
+                
+                if(err)
+                {
+                    res.status(404).send("Error deleting the object.");
+                    return;
+                }
+                res.json(noteObject);
+            });
+        }
     });
 });
 
 //getAllNotes
 app.get('/get-my-notes', verifyToken, (req, res) => {
-    console.log("/get-my-notes");
+    //console.log("/get-my-notes");
     jwt.verify(req.token, 'secretkey', (err, authData) => {
-        console.log(req.token);
+        //console.log(req.token);
         if(err)
         {
-            res.status("Token not verified.");
+            res.status(400).send("Token not verified.");
         }
         else
         {

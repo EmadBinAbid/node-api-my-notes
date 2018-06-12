@@ -24,7 +24,7 @@ var myNotesAppSchema = mongoose.Schema(
         createdOn:
         {
             type: Date,
-            default: Date.now,
+            default: new Date(),
             required: true
         },
         updatedOn:
