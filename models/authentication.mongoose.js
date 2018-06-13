@@ -17,13 +17,13 @@ var authenticationSchema = mongoose.Schema(
     }
 );
 
-var AuthenticationModel = mongoose.model('AuthenticationModel', authenticationSchema);
+var AuthenticationModel = exports.AuthenticationModel = mongoose.model('AuthenticationModel', authenticationSchema);
 
 /*Functions to handle Http requests*/
 
 exports.addUser = function(newUserObject, callback)
 {
-    AuthenticationModel.create(newUserObject, callback);
+    AuthenticationModel.create(newUserObject, callback);   
 }
 
 exports.updateUser = function(_userId, updatedUserObject, options, callback)

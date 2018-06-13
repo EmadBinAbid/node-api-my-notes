@@ -137,14 +137,25 @@ authenticationSchema
 //addUser
 app.post('/register', (req, res) => {
     console.log("In /register.");
-    authenticationSchema.addUser(req.body, function(err, userObject)
+
+    authenticationSchema.AuthenticationModel.find({ userId: req.body.userId }, function(err, userObject)
     {
-       if(err)
-       {
-           res.status(400).send("Bad request.");
-           return;
-       }
-       res.json(userObject);
+        if(userObject.length === 1)
+        {
+            res.json({ "status": false });
+        }
+        else
+        {
+            authenticationSchema.addUser(req.body, function(err, userObject)
+            {
+                if(err)
+                {
+                    res.status(400).send("Bad request.");
+                    return;
+                }
+                res.json(userObject);
+            });
+        }
     });
 });
 
