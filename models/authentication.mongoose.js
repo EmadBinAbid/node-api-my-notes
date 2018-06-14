@@ -4,6 +4,16 @@ var mongoose = require('mongoose');
 //Authentication Schema
 var authenticationSchema = mongoose.Schema(
     {
+        firstName:
+        {
+            type: String,
+            required: true
+        },
+        lastName:
+        {
+            type: String,
+            required: true
+        },
         userId:
         {
             type: String,
@@ -13,7 +23,17 @@ var authenticationSchema = mongoose.Schema(
         {
             type: String,
             required: true
-        }
+        },
+        age:
+        {
+            type: String,
+            required: true
+        },
+        profession:
+        {
+            type: String,
+            required: true
+        },
     }
 );
 
