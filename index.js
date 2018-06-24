@@ -263,4 +263,4 @@ app.get('/', (req, res) => {
 
 
 //Running the server
-server.run(app, 3000);
+server.run(app, 3000 || process.env.PORT);
