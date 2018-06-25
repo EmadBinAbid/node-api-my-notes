@@ -225,7 +225,7 @@ app.post('/login', (req, res) => {
 });
 
 //getAllUsers
-app.get('/get-users', (req, res) => {
+app.get('/users', (req, res) => {
     authenticationSchema.getAllUsers(function(err, userObject)
     {
         if(err)
